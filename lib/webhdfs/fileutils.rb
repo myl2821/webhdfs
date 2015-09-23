@@ -12,6 +12,7 @@ module WebHDFS
     @fu_ssl_ca_file = nil
     @fu_ssl_verify_mode = nil
     @fu_kerberos = false
+    @fu_namenoderpcaddress = 'localhost:9000'
 
     # Public: Set hostname and port number of WebHDFS
     #
@@ -26,13 +27,15 @@ module WebHDFS
     #
     #   FileUtils.set_server 'localhost', 50070
     #
-    def set_server(host, port, user=nil, doas=nil, proxy_address=nil, proxy_port=nil)
+    def set_server(host, port, user=nil, namenoderpcaddress='localhost:9000', doas=nil, proxy_address=nil, proxy_port=nil)
       @fu_host = host
       @fu_port = port
       @fu_user = user
       @fu_doas = doas
       @fu_paddr = proxy_address
       @fu_pport = proxy_port
+      @fu_namenoderpcaddress = namenoderpcaddress
+      nil
     end
     module_function :set_server
 
@@ -415,7 +418,7 @@ module WebHDFS
 
     # Internal
     def client
-      client = WebHDFS::Client.new(@fu_host, @fu_port, @fu_user, @fu_doas, @fu_paddr, @fu_pport)
+      client = WebHDFS::Client.new(@fu_host, @fu_port, @fu_namenoderpcaddress, @fu_user, @fu_doas, @fu_paddr, @fu_pport)
       if @fu_httpfs_mode
         client.httpfs_mode = true
       end

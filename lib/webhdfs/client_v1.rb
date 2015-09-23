@@ -8,7 +8,7 @@ require_relative 'exceptions'
 module WebHDFS
   class ClientV1
 
-    DEBUG = true
+    DEBUG = false
     def pdbg(s)
       puts(s) if DEBUG
     end
