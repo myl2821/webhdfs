@@ -8,11 +8,16 @@ require_relative 'exceptions'
 module WebHDFS
   class ClientV1
 
+    DEBUG = true
+    def pdbg(s)
+      puts(s) if DEBUG
+    end
+
     # This hash table holds command options.
     OPT_TABLE = {} # internal use only
     KNOWN_ERRORS = ['LeaseExpiredException'].freeze
 
-    attr_accessor :host, :port, :username, :doas, :proxy_address, :proxy_port
+    attr_accessor :host, :port, :username, :namenoderpcaddress, :doas, :proxy_address, :proxy_port
     attr_accessor :proxy_user, :proxy_pass
     attr_accessor :open_timeout # default 30s (in ruby net/http)
     attr_accessor :read_timeout # default 60s (in ruby net/http)
@@ -47,7 +52,7 @@ module WebHDFS
       @retry_known_errors = false
       @retry_times = 1
       @retry_interval = 1
-
+      @namenoderpcaddress = namenoderpcaddress
       @httpfs_mode = false
 
       @ssl = false
@@ -249,6 +254,7 @@ module WebHDFS
              else
                {'op' => op}
              end
+      opts.merge!({'namenoderpcaddress' => @namenoderpcaddress})
       query = URI.encode_www_form(params.merge(opts))
       api_path(path) + '?' + query
     end
@@ -296,6 +302,9 @@ module WebHDFS
                      else
                        path
                      end
+
+      pdbg(request_path)
+
       if @ssl
         conn.use_ssl = true
         conn.ca_file = @ssl_ca_file if @ssl_ca_file
